@@ -8,27 +8,34 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ReadFileM3U8 {
 
-	public static ArrayList<String> listFinish = new ArrayList<String>();
+	public static Map<String, String> listFinish = new HashMap<>();
+    public static ConcurrentLinkedQueue<String> listError = new ConcurrentLinkedQueue<>();
 
 	public void downloadThread(String urlM3U8) {
-		
 		ConcurrentLinkedQueue<String> listLink = readFile(urlM3U8);
 		while (true) {
 			if (listLink.size() > 0) {
-				if (listFinish.size() < AppGlobal.THREAD_NUMBER) {
+				if (listFinish.size() <= AppGlobal.THREAD_NUMBER) {
 
 					int count = listFinish.size() == 0 ? AppGlobal.THREAD_NUMBER : AppGlobal.THREAD_NUMBER - listFinish.size();
 					for (int i = 0; i < count; i++) {
 						if(listLink.size() > 0) {
 							String linkDownload = listLink.poll();
-							listFinish.add(linkDownload);
+
+                            String fileName = linkDownload.substring(linkDownload.lastIndexOf("/") + 1);
+
+                            if(fileName.contains("?")) {
+                                fileName = fileName.substring(0, fileName.indexOf("?"));
+                            }
+
+							listFinish.put(fileName, linkDownload);
 
 							String htmlPath = linkDownload.substring(0, linkDownload.lastIndexOf("/"));
 							String folderPath = htmlPath.substring(htmlPath.lastIndexOf(":") + 1);
@@ -43,12 +50,17 @@ public class ReadFileM3U8 {
 						
 					}
 				}
-
 			}
+
+            if (listError.size() > 0) {
+                for (int i = 0; i < listError.size(); i++) {
+                    listLink.add(listError.poll());
+                }
+            }
 
 			try {
 				Thread.sleep(5000);
-				System.out.println("Connection ...");
+				System.out.println("Connection ..." + listLink.size() + "/" + ReadFileM3U8.listFinish.size());
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -57,10 +69,7 @@ public class ReadFileM3U8 {
 				joinFile(urlM3U8);
 				break;
 			}
-			
-			
 		}
-
 	}
 
 	public void joinFile(String urlM3U8) {
@@ -136,13 +145,9 @@ public class ReadFileM3U8 {
 
 	}
 
-	private ConcurrentLinkedQueue<String> listLink = new ConcurrentLinkedQueue<String>();
-	
 	public ConcurrentLinkedQueue<String> readFile(String urlM3U8) {
-		
+        ConcurrentLinkedQueue<String> listLink = new ConcurrentLinkedQueue<>();
 		try {
-
-			
 			URL url = new URL(urlM3U8);
 	        
 			URLConnection urlConnection = url.openConnection();
@@ -160,8 +165,8 @@ public class ReadFileM3U8 {
 					}
 				}
 				if (line.contains(".ts")) {
-					listLink.add(htmlPath + "/" + line);
-					//System.out.println(htmlPath + "/" + line);
+					listLink.add(htmlPath + "/" + line + "&sk=admin");
+					System.out.println(htmlPath + "/" + line);
 				}
 			}
 		} catch (Exception e) {
@@ -170,12 +175,15 @@ public class ReadFileM3U8 {
 		return listLink;
 	}
 
+	private static String makeUrl(String url) {
+		return StringUtils.replaceAll(url, "\\s+", "+");
+	}
+
 	public static void main(String[] args) {
 		try {
-			
-			String url = "http://dbbvppqb.cdnviet.com/medianet_vod/_definst_/mp4:medianet/yeah1/DEN_XANH_TINH_BAN/YSP_DXTB_010.mp4/playlist.m3u8".replaceAll("\\s+", "+");
-			//new ReadFileM3U8().downloadThread(url);
-			new ReadFileM3U8().joinFile(url);
+			new ReadFileM3U8().downloadThread(makeUrl("http://study.udemyvietnam.vn/vod/_definst_/mp4:HoangVM_01/12.mp4/chunklist_w559670374.m3u8?index=1"));
+			//new ReadFileM3U8().joinFile(makeUrl("http://study.udemyvietnam.vn/vod/_definst_/mp4:HoangVM_01/12.mp4/chunklist_w559670374.m3u8?index=1"));
+			//new ReadFileM3U8().readFile(makeUrl("http://study.udemyvietnam.vn/vod/_definst_/mp4:HoangVM_01/11.mp4/chunklist_w559670374.m3u8?index=1"));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.io.FileUtils;
+
 public class ThreadDownload implements Runnable {
 
 	private String linkDownload;
@@ -15,29 +17,32 @@ public class ThreadDownload implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			dowwnloadFile();
+			downloadFile();
 		} catch (Exception e) {
 			System.out.println("##Loi "+e+" file: " + linkDownload);
 		}
 	}
 	
-	public void dowwnloadFile() throws Exception {
+	public void downloadFile() throws Exception {
 		File f = new File(folderDownload);
+
 		if(!f.exists()) {
 			f.mkdirs();
 		}
+
 		String fileName = linkDownload.substring(linkDownload.lastIndexOf("/") + 1);
+
 		if(fileName.contains("?")) {
 			fileName = fileName.substring(0, fileName.indexOf("?"));
 		}
+
 		if(new File(folderDownload + fileName).exists()) {
 			System.out.println("## Exists file: " + fileName);
-			ReadFileM3U8.listFinish.remove(linkDownload);
+			ReadFileM3U8.listFinish.remove(fileName);
 		} else {
 			URL url = new URL(linkDownload);
-			
+
 			URLConnection urlConnection = url.openConnection();
-			//urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36");
 			System.out.println("## Start: " + fileName);
 			long start = System.currentTimeMillis();
 			InputStream inputStream = urlConnection.getInputStream();
@@ -52,16 +57,30 @@ public class ThreadDownload implements Runnable {
 			fileOutputStream.flush();
 			fileOutputStream.close();
 			inputStream.close();
-			long end = (System.currentTimeMillis() - start) / 1000;
-			ReadFileM3U8.listFinish.remove(linkDownload);
-			double speed =  0;
-			System.out.println("## Finish: " + fileName + " ##Time: " + end + "s" + " ##Speed: " +speed+ " Kbps");
-			System.out.println("###########################################################");
+
+			long fileLength = urlConnection.getContentLengthLong();
+
+			long existingFileSize = new File(folderDownload + fileName).length();
+
+			if (existingFileSize < fileLength) {
+				new File(folderDownload + fileName).delete();
+				System.out.println("## DeleteFile: " + fileName);
+				ReadFileM3U8.listError.add(linkDownload);
+			}
+
+			if (existingFileSize == fileLength) {
+				long end = (System.currentTimeMillis() - start) / 1000;
+				System.out.println("## Finish: " + fileName + " ##Time: " + end + "s");
+				System.out.println("## FileLength: " + fileLength + " ##ExistingFileSize: " + existingFileSize);
+				System.out.println("###########################################################");
+			}
+
+			ReadFileM3U8.listFinish.remove(fileName);
 		}
 	
 	}
-	
-	
+
+
 
 	public String getLinkDownload() {
 		return linkDownload;
