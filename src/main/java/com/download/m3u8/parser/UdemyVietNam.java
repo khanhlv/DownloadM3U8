@@ -5,9 +5,8 @@ import java.util.Map;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
-import com.download.m3u8.AppGlobal;
+import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.common.UserAgent;
 
 public class UdemyVietNam {

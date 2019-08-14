@@ -45,7 +45,7 @@
         </encoder>
     </appender>
     
-    <logger name="com.ttruyen" level="INFO">
+    <logger name="com.download.m3u8" level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="DEFAULT_LOG" />
     </logger>
