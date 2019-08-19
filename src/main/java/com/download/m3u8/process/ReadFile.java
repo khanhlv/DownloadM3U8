@@ -1,15 +1,14 @@
 package com.download.m3u8.process;
 
+import com.download.m3u8.common.AppGlobal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.download.m3u8.common.AppGlobal;
 
 public class ReadFile {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReadFile.class);
@@ -45,5 +44,9 @@ public class ReadFile {
         }
 
         return listLink;
+    }
+
+    public static void main(String[] args) {
+        new ReadFile().read("http://210.211.96.151:1935/vod/_definst_/mp4:Tambooks/Lamita_01/1.mp4/chunklist_w559670374.m3u8?index=1");
     }
 }

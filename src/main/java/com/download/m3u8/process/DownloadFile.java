@@ -1,16 +1,15 @@
 package com.download.m3u8.process;
 
+import com.download.m3u8.common.AppGlobal;
+import com.download.m3u8.common.ShareQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.download.m3u8.common.AppGlobal;
-import com.download.m3u8.common.ShareQueue;
 
 public class DownloadFile implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(DownloadFile.class);
@@ -24,10 +23,10 @@ public class DownloadFile implements Runnable {
     @Override
     public void run() {
         try {
+            LOGGER.info(String.format("[LINK_FILE=%s]", link));
             downloadFile();
         } catch (Exception ex) {
             LOGGER.error(String.format("[ERROR_FILE=%s]", link), ex);
-            ShareQueue.shareQueue.add(link);
         }
     }
 
@@ -42,7 +41,7 @@ public class DownloadFile implements Runnable {
         String htmlPath = link.substring(0, link.lastIndexOf("/"));
         String folder = htmlPath.substring(htmlPath.lastIndexOf(":") + 1);
         folder = folder.substring(0, folder.lastIndexOf("."));
-        folder = AppGlobal.FOLDER_ROOT + folder;
+        folder = AppGlobal.FOLDER_ROOT + folder + "/INPUT/";
 
         File f = new File(folder);
 
@@ -50,12 +49,9 @@ public class DownloadFile implements Runnable {
             f.mkdirs();
         }
 
-        if(fileName.contains("?")) {
-            fileName = fileName.substring(0, fileName.indexOf("?"));
-        }
-
         if(new File(folder + fileName).exists()) {
             LOGGER.info(String.format("[EXISTS_FILE=%s]", fileName));
+            ShareQueue.shareQueue.remove(link);
         } else {
             URL url = new URL(link);
             URLConnection urlConnection = url.openConnection();
@@ -88,8 +84,16 @@ public class DownloadFile implements Runnable {
             if (existingFileSize == fileLength) {
                 long end = (System.currentTimeMillis() - start) / 1000;
                 LOGGER.info(String.format("[END_DOWNLOAD_FILE=%s][TIME=%s][FILE_SIZE=%s/%s]", fileName, end, fileLength, existingFileSize));
-                ShareQueue.shareQueueDownload.remove(link);
+                ShareQueue.shareQueue.remove(link);
             }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            new DownloadFile("http://210.211.96.151:1935/vod/_definst_/mp4:Tambooks/Lamita_01/1.mp4/media_w559670374_0.ts?index=1").downloadFile();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

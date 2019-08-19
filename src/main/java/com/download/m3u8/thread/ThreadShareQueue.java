@@ -1,18 +1,16 @@
 package com.download.m3u8.thread;
 
-import java.util.List;
-
+import com.download.m3u8.common.ShareQueue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.download.m3u8.common.ShareQueue;
 
 public class ThreadShareQueue implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadShareQueue.class);
 
     public ThreadShareQueue() {
-        System.out.println("START_THREAD_QUEUE");
+        LOGGER.info("START_THREAD_QUEUE");
     }
 
     @Override
@@ -24,15 +22,16 @@ public class ThreadShareQueue implements Runnable {
                     if (ShareQueue.shareQueue.size() > 0) {
                         for (int i = 0; i < size; i++) {
                             String link = ShareQueue.shareQueue.poll();
-
-                            ShareQueue.shareQueueDownload.put(link, link);
+                            if (StringUtils.isNotBlank(link)) {
+                                ShareQueue.shareQueueDownload.add(link);
+                            }
                         }
                     }
                 }
 
-                LOGGER.info("SHARE_QUEUE=" + ShareQueue.shareQueue.size());
+                LOGGER.info(String.format("THREAD_SHARE[QUEUE=%s][DOWNLOAD=%s]",ShareQueue.shareQueue.size(),ShareQueue.shareQueueDownload.size()));
 
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             }
         } catch (Exception ex) {
             LOGGER.error("ERROR[ThreadShareQueue]", ex);

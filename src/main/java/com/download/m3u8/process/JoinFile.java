@@ -1,5 +1,9 @@
 package com.download.m3u8.process;
 
+import com.download.m3u8.common.AppGlobal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,9 +11,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.download.m3u8.common.AppGlobal;
-
 public class JoinFile {
+    private final static Logger LOGGER = LoggerFactory.getLogger(JoinFile.class);
+
     public void join(String urlM3U8) {
         try {
             urlM3U8 = AppGlobal.makeUrl(urlM3U8);
@@ -75,8 +79,12 @@ public class JoinFile {
                 fileOutputStream.close();
 
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            LOGGER.error("ERROR[JoinFile]", ex);
         }
+    }
+
+    public static void main(String[] args) {
+        new JoinFile().join("http://210.211.96.151:1935/vod/_definst_/mp4:Tambooks/Lamita_01/1.mp4/chunklist_w559670374.m3u8?index=1");
     }
 }
