@@ -4,21 +4,28 @@ import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.common.UserAgent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UdemyVietNam {
-    private void read() throws Exception {
+    private String userAgent = UserAgent.getUserAgent();
+    private Map<String, String> mapCookies;
+
+    public List<UdemyCourse> readCourse() throws Exception {
         Map<String, String> data = new HashMap<>();
         data.put("txtUsername", AppGlobal.USER_NAME_1);
         data.put("txtPassword", AppGlobal.PASSWORD_1);
-
-        String userAgent = UserAgent.getUserAgent();
 
         Document docs = Jsoup.connect("http://study.udemyvietnam.vn/Login.aspx")
                 .userAgent(userAgent).timeout(10000).get();
@@ -43,41 +50,85 @@ public class UdemyVietNam {
 
 //        System.out.println(response.cookies());
 
+        mapCookies = response.cookies();
+
         Document document = Jsoup.connect("http://study.udemyvietnam.vn/KhoaHocCuaToi.aspx")
                 .userAgent(userAgent)
-                .cookies(response.cookies())
+                .cookies(mapCookies)
                 .timeout(10000)
                 .get();
-
 
         String urlListCourse = String.format("http://study.udemyvietnam.vn/CommonClass/StudyServices.asmx/GetCourse?idUser=%s", document.select("#hdfIdUser").attr("value"));
 
         Document docsCourse = Jsoup.connect(urlListCourse)
                 .userAgent(userAgent)
                 .ignoreContentType(true)
-                .cookies(response.cookies())
+                .cookies(mapCookies)
                 .timeout(10000)
                 .get();
-
 
         //System.out.println(docsCourse.tagName("body").text());
 
         List<UdemyCourse> udemyCourseList = new Gson().fromJson(docsCourse.tagName("body").text(), new TypeToken<List<UdemyCourse>>(){}.getType());
 
-        System.out.println(udemyCourseList.size());
+//        System.out.println(udemyCourseList.size());
 
-        Document docsLink = Jsoup.connect("http://study.udemyvietnam.vn/play/study.aspx?courseId=346")
+        return udemyCourseList;
+    }
+
+    public List<UdemyCoursePlay> readPlayCourse(String id) throws Exception {
+
+        List<UdemyCoursePlay> udemyCoursePlayList = new ArrayList<>();
+        Document docsLinkGet = Jsoup.connect("http://study.udemyvietnam.vn/play/study.aspx?courseId=" + id)
                 .userAgent(userAgent)
-                .cookies(response.cookies())
+                .cookies(mapCookies)
                 .timeout(10000)
                 .get();
 
-        System.out.println(docsLink.select("div[data-link]"));
+        Map<String, String> dataStudy = new HashMap<>();
 
+        dataStudy.put("__EVENTTARGET", docsLinkGet.select("input[name=\"__EVENTTARGET\"]").attr("value"));
+        dataStudy.put("__EVENTARGUMENT", docsLinkGet.select("input[name=\"__EVENTARGUMENT\"]").attr("value"));
+        dataStudy.put("__VIEWSTATE", docsLinkGet.select("input[name=\"__VIEWSTATE\"]").attr("value"));
+        dataStudy.put("__VIEWSTATEGENERATOR", docsLinkGet.select("input[name=\"__VIEWSTATEGENERATOR\"]").attr("value"));
+        dataStudy.put("txtError", "");
+        dataStudy.put("hdf_video_index", docsLinkGet.select("input[name=\"hdf_video_index\"]").attr("value"));
+        dataStudy.put("hdf_user_id", docsLinkGet.select("input[name=\"hdf_user_id\"]").attr("value"));
+        dataStudy.put("hdf_video_id", docsLinkGet.select("input[name=\"hdf_video_id\"]").attr("value"));
+        dataStudy.put("DXScript", "1_16,1_66,1_17,1_18,1_19,1_20,1_13,1_28");
+        dataStudy.put("DXCss", "vendor/bootstrap/bootstrap.css,vendor/bootstrap/bootstrap-progressbar-3.css,vendor/font-awesome/css/font-awesome.css,https://fonts.googleapis.com/icon?family=Material+Icons,css/font-awesome.css,css/nprogress.css,css/green.css,css/result.css,css/play.css");
+        dataStudy.put("__CALLBACKID", "callbackGetListVideo");
+        dataStudy.put("__CALLBACKPARAM", "c0:59");
+        dataStudy.put("__EVENTVALIDATION", docsLinkGet.select("input[name=\"__EVENTVALIDATION\"]").attr("value"));
+
+        Document docsLink = Jsoup.connect("http://study.udemyvietnam.vn/play/study.aspx?courseId=" + id)
+                .userAgent(userAgent)
+                .cookies(mapCookies)
+                .timeout(10000)
+                .data(dataStudy)
+                .post();
+
+        String data = docsLink.select("div[data-link]").toString().replaceAll("\\\\r|\\\\'|\\\\n|\\\\t", "");
+
+        Document docData = Jsoup.parse(data);
+
+        docData.select("div[data-link]").forEach(v -> {
+            String name = StringUtils.trim(v.select(".chap-item-content .row:eq(0) .chap-active").text());
+            String dataLink = StringUtils.trim(v.attr("data-link"));
+
+            UdemyCoursePlay udemyCoursePlay = new UdemyCoursePlay();
+            udemyCoursePlay.setId(dataLink);
+            udemyCoursePlay.setName(name);
+            udemyCoursePlayList.add(udemyCoursePlay);
+        });
+
+        return udemyCoursePlayList;
 
     }
 
     public static void main(String[] args) throws Exception {
-        new UdemyVietNam().read();
+        UdemyVietNam udemyVietNam = new UdemyVietNam();
+        udemyVietNam.readCourse();
+        System.out.println(udemyVietNam.readPlayCourse("59").size());
     }
 }

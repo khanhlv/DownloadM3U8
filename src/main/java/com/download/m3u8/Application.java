@@ -1,6 +1,7 @@
 package com.download.m3u8;
 
 import com.download.m3u8.common.ShareQueue;
+import com.download.m3u8.parser.UdemyVietNam;
 import com.download.m3u8.process.ReadFile;
 import com.download.m3u8.thread.ThreadDownloadFile;
 import com.download.m3u8.thread.ThreadShareQueue;
@@ -13,10 +14,15 @@ public class Application {
     private final static Logger LOGGER = LoggerFactory.getLogger(Application.class);
     private final ReadFile readFile = new ReadFile();
 
-    private void addQueue() {
-        ConcurrentLinkedQueue<String> linkList = readFile.read("http://210.211.96.151:1935/vod/_definst_/mp4:Tambooks/Lamita_01/1.mp4/chunklist_w559670374.m3u8?index=1");
+    private void addQueue() throws Exception {
+        UdemyVietNam udemyVietNam = new UdemyVietNam();
+        udemyVietNam.readCourse();
 
-        ShareQueue.shareQueue.addAll(linkList);
+        // 210.211.96.151:1935
+        udemyVietNam.readPlayCourse("59").forEach(v -> {
+            ConcurrentLinkedQueue<String> linkList = readFile.read(String.format("http://study.udemyvietnam.vn/vod/_definst_/mp4:%s/playlist.m3u8", v.getId()));
+            ShareQueue.shareQueue.addAll(linkList);
+        });
     }
 
     private void execute() {
@@ -32,7 +38,7 @@ public class Application {
 
             new Thread(new ThreadShareQueue()).start();
 
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             LOGGER.error("ERROR[Application]",e);
         }
     }
