@@ -52,6 +52,7 @@ public class DownloadFile implements Runnable {
         if(new File(folder + fileName).exists()) {
             LOGGER.info(String.format("[EXISTS_FILE=%s]", fileName));
             ShareQueue.shareQueue.remove(link);
+            ShareQueue.shareQueueDownload.remove(link);
         } else {
             URL url = new URL(link);
             URLConnection urlConnection = url.openConnection();
@@ -79,12 +80,14 @@ public class DownloadFile implements Runnable {
                 new File(folder + fileName).delete();
                 LOGGER.info(String.format("[DELETE_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileName, fileLength, existingFileSize));
                 ShareQueue.shareQueue.add(link);
+                ShareQueue.shareQueueDownload.remove(link);
             }
 
             if (existingFileSize == fileLength) {
                 long end = (System.currentTimeMillis() - start) / 1000;
                 LOGGER.info(String.format("[END_DOWNLOAD_FILE=%s][TIME=%s][FILE_SIZE=%s/%s]", fileName, end, fileLength, existingFileSize));
                 ShareQueue.shareQueue.remove(link);
+                ShareQueue.shareQueueDownload.remove(link);
             }
         }
     }

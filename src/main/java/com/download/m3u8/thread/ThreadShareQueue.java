@@ -1,6 +1,8 @@
 package com.download.m3u8.thread;
 
 import com.download.m3u8.common.ShareQueue;
+import com.download.m3u8.process.DownloadFile;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +24,10 @@ public class ThreadShareQueue implements Runnable {
                     if (ShareQueue.shareQueue.size() > 0) {
                         for (int i = 0; i < size; i++) {
                             String link = ShareQueue.shareQueue.poll();
+
                             if (StringUtils.isNotBlank(link)) {
                                 ShareQueue.shareQueueDownload.add(link);
+                                new Thread(new DownloadFile(link)).start();
                             }
                         }
                     }
@@ -31,7 +35,7 @@ public class ThreadShareQueue implements Runnable {
 
                 LOGGER.info(String.format("THREAD_SHARE[QUEUE=%s][DOWNLOAD=%s]",ShareQueue.shareQueue.size(),ShareQueue.shareQueueDownload.size()));
 
-                Thread.sleep(20000);
+                Thread.sleep(10000);
             }
         } catch (Exception ex) {
             LOGGER.error("ERROR[ThreadShareQueue]", ex);

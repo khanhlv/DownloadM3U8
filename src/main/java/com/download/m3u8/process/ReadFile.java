@@ -34,6 +34,7 @@ public class ReadFile {
                     } else {
                         pathFile = htmlPath + "/" + line + "?index=1";
                     }
+                    break;
                 }
             }
         } catch (Exception ex) {
