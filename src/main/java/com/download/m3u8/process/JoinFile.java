@@ -2,6 +2,7 @@ package com.download.m3u8.process;
 
 import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.parser.UdemyVietNam;
+import com.download.m3u8.utils.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +17,15 @@ import java.util.Comparator;
 public class JoinFile {
     private final static Logger LOGGER = LoggerFactory.getLogger(JoinFile.class);
 
-    public void join(String name, String folder) throws Exception {
-        folder = folder.replaceAll("\\s+", "_").replaceAll(":|\\?", "");
+    public void join(String name, String input, String output) throws Exception {
+        output = StringUtil.stripAccentsNone(output, "_");
+        input = StringUtil.stripAccentsNone(input, "_");
         String fileName = name.substring(name.lastIndexOf("/") + 1);
         String folderInput = name.replaceAll(".mp4", "");
         String folderOutput = name.substring(0, name.lastIndexOf("/"));
 
-        File fileInput = new File(AppGlobal.FOLDER_ROOT + folderInput + "/INPUT/" );
-        File fileOutput = new File(AppGlobal.FOLDER_ROOT + folderOutput + "/OUTPUT/" + folder + "/");
+        File fileInput = new File(AppGlobal.FOLDER_ROOT + input + "/" + folderInput + "/INPUT/");
+        File fileOutput = new File(AppGlobal.FOLDER_ROOT + input + "/" + folderOutput + "/OUTPUT/" + output + "/");
 
         if (fileInput.exists()) {
             if(!fileOutput.exists()) {
@@ -54,10 +56,10 @@ public class JoinFile {
                 }
             });
 
-            FileOutputStream fileOutputStream = new FileOutputStream(AppGlobal.FOLDER_ROOT + folderOutput + "/OUTPUT/" + folder + "/" + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(AppGlobal.FOLDER_ROOT + input + "/" + folderOutput + "/OUTPUT/" + output + "/" + fileName);
 
             for (int i = 0; i < listFile.length; i++) {
-                String path = AppGlobal.FOLDER_ROOT + folderInput + "/INPUT/" + listFile[i].getName();
+                String path = AppGlobal.FOLDER_ROOT + input + "/" + folderInput + "/INPUT/" + listFile[i].getName();
                 File fD = new File(path);
                 if (!fD.exists()) {
                     break;
@@ -155,17 +157,25 @@ public class JoinFile {
 
         JoinFile joinFile = new JoinFile();
         UdemyVietNam udemyVietNam = new UdemyVietNam();
-        udemyVietNam.readCourse();
-        udemyVietNam.readPlayCourse("59").forEach(v -> {
-            System.out.println(v.getId());
-            System.out.println(v.getName());
-
+        udemyVietNam.readCourse().forEach(d -> {
             try {
-                joinFile.join(v.getId(), v.getName());
+                System.out.println(d.getID_COURSE());
+                System.out.println(d.getCOURSE_NAME());
+                udemyVietNam.readPlayCourse(d.getID_COURSE()).forEach(v -> {
+                    System.out.println(v.getId());
+                    System.out.println(v.getName());
+
+                    try {
+                        joinFile.join(v.getId(), d.getCOURSE_NAME(), v.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
 
     }
 }

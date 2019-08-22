@@ -1,6 +1,7 @@
 package com.download.m3u8.process;
 
 import com.download.m3u8.common.AppGlobal;
+import com.download.m3u8.utils.StringUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,10 +44,12 @@ public class ReadFile {
         return pathFile;
     }
 
-    public ConcurrentLinkedQueue<String> read(String urlM3U8) {
+    public ConcurrentLinkedQueue<String> read(String urlM3U8, String folderRoot) {
         urlM3U8 = AppGlobal.makeUrl(urlM3U8);
 
         urlM3U8 = fileM3U8(urlM3U8);
+
+        folderRoot = StringUtil.stripAccentsNone(folderRoot, "_");
 
         LOGGER.info(String.format("[LINK_M3U8=%s]", urlM3U8));
 
@@ -62,7 +65,7 @@ public class ReadFile {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.contains(".ts")) {
-                    listLink.add(htmlPath + "/" + line + "&sk=admin");
+                    listLink.add(folderRoot + "|" + htmlPath + "/" + line + "&sk=admin");
                 }
             }
         } catch (Exception ex) {

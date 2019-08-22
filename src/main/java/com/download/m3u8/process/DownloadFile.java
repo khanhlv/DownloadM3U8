@@ -2,6 +2,8 @@ package com.download.m3u8.process;
 
 import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.common.ShareQueue;
+import com.download.m3u8.utils.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,23 +16,27 @@ import java.net.URLConnection;
 public class DownloadFile implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(DownloadFile.class);
 
-    private String link;
+    private String linkFile;
 
-    public DownloadFile(String link) {
-        this.link = link;
+    public DownloadFile(String linkFile) {
+        this.linkFile = linkFile;
     }
 
     @Override
     public void run() {
         try {
-            LOGGER.info(String.format("[LINK_FILE=%s]", link));
+            LOGGER.info(String.format("[LINK_FILE=%s]", linkFile));
             downloadFile();
         } catch (Exception ex) {
-            LOGGER.error(String.format("[ERROR_FILE=%s]", link), ex);
+            LOGGER.error(String.format("[ERROR_FILE=%s]", linkFile), ex);
         }
     }
 
     public void downloadFile() throws Exception {
+
+        String[] structFile = linkFile.split("\\|");
+
+        String link = structFile[1];
 
         String fileName = link.substring(link.lastIndexOf("/") + 1);
 
@@ -43,7 +49,7 @@ public class DownloadFile implements Runnable {
         String htmlPath = link.substring(0, link.lastIndexOf("/"));
         String folder = htmlPath.substring(htmlPath.lastIndexOf(":") + 1);
         folder = folder.substring(0, folder.lastIndexOf("."));
-        folder = AppGlobal.FOLDER_ROOT + folder + "/INPUT/";
+        folder = AppGlobal.FOLDER_ROOT + StringUtil.stripAccentsNone(structFile[0], "_") + "/" + folder + "/INPUT/";
 
         File f = new File(folder);
 
@@ -93,14 +99,14 @@ public class DownloadFile implements Runnable {
         if (existingFileSize < fileLength) {
             fileExists.delete();
             LOGGER.info(String.format("[DELETE_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileExists.getName(), fileLength, existingFileSize));
-            ShareQueue.shareQueue.add(link);
-            ShareQueue.shareQueueDownload.remove(link);
+            ShareQueue.shareQueue.add(linkFile);
+            ShareQueue.shareQueueDownload.remove(linkFile);
         }
 
         if (existingFileSize == fileLength) {
             LOGGER.info(String.format("[END_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileExists.getName(), fileLength, existingFileSize));
-            ShareQueue.shareQueue.remove(link);
-            ShareQueue.shareQueueDownload.remove(link);
+            ShareQueue.shareQueue.remove(linkFile);
+            ShareQueue.shareQueueDownload.remove(linkFile);
         }
 
     }
