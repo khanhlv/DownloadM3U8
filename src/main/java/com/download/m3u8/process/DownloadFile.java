@@ -38,6 +38,8 @@ public class DownloadFile implements Runnable {
             fileName = fileName.substring(0, fileName.indexOf("?"));
         }
 
+        fileName = fileName.substring(fileName.lastIndexOf("_") + 1);
+
         String htmlPath = link.substring(0, link.lastIndexOf("/"));
         String folder = htmlPath.substring(htmlPath.lastIndexOf(":") + 1);
         folder = folder.substring(0, folder.lastIndexOf("."));
@@ -51,14 +53,20 @@ public class DownloadFile implements Runnable {
 
         if(new File(folder + fileName).exists()) {
             LOGGER.info(String.format("[EXISTS_FILE=%s]", fileName));
-            ShareQueue.shareQueue.remove(link);
-            ShareQueue.shareQueueDownload.remove(link);
+
+            URL url = new URL(link);
+            URLConnection urlConnection = url.openConnection();
+
+            long fileLength = urlConnection.getContentLengthLong();
+
+            File fileExists = new File(folder + fileName);
+
+            checkFileValid(fileLength, fileExists);
         } else {
             URL url = new URL(link);
             URLConnection urlConnection = url.openConnection();
             LOGGER.info(String.format("[START_DOWNLOAD_FILE=%s]", fileName));
 
-            long start = System.currentTimeMillis();
             InputStream inputStream = urlConnection.getInputStream();
 
             FileOutputStream fileOutputStream = new FileOutputStream(new File(folder + fileName));
@@ -74,22 +82,27 @@ public class DownloadFile implements Runnable {
 
             long fileLength = urlConnection.getContentLengthLong();
 
-            long existingFileSize = new File(folder + fileName).length();
+            File fileExists = new File(folder + fileName);
 
-            if (existingFileSize < fileLength) {
-                new File(folder + fileName).delete();
-                LOGGER.info(String.format("[DELETE_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileName, fileLength, existingFileSize));
-                ShareQueue.shareQueue.add(link);
-                ShareQueue.shareQueueDownload.remove(link);
-            }
-
-            if (existingFileSize == fileLength) {
-                long end = (System.currentTimeMillis() - start) / 1000;
-                LOGGER.info(String.format("[END_DOWNLOAD_FILE=%s][TIME=%s][FILE_SIZE=%s/%s]", fileName, end, fileLength, existingFileSize));
-                ShareQueue.shareQueue.remove(link);
-                ShareQueue.shareQueueDownload.remove(link);
-            }
+            checkFileValid(fileLength, fileExists);
         }
+    }
+
+    private void checkFileValid(long fileLength, File fileExists) {
+        long existingFileSize = fileExists.length();
+        if (existingFileSize < fileLength) {
+            fileExists.delete();
+            LOGGER.info(String.format("[DELETE_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileExists.getName(), fileLength, existingFileSize));
+            ShareQueue.shareQueue.add(link);
+            ShareQueue.shareQueueDownload.remove(link);
+        }
+
+        if (existingFileSize == fileLength) {
+            LOGGER.info(String.format("[END_DOWNLOAD_FILE=%s][FILE_SIZE=%s/%s]", fileExists.getName(), fileLength, existingFileSize));
+            ShareQueue.shareQueue.remove(link);
+            ShareQueue.shareQueueDownload.remove(link);
+        }
+
     }
 
     public static void main(String[] args) {

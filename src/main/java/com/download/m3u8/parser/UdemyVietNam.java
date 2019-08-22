@@ -113,7 +113,7 @@ public class UdemyVietNam {
         Document docData = Jsoup.parse(data);
 
         docData.select("div[data-link]").forEach(v -> {
-            String name = StringUtils.trim(v.select(".chap-item-content .row:eq(0) .chap-active").text());
+            String name = StringUtils.trim(v.select(".chap-item-content .row").get(0).select(".chap-active").text());
             String dataLink = StringUtils.trim(v.attr("data-link"));
 
             UdemyCoursePlay udemyCoursePlay = new UdemyCoursePlay();

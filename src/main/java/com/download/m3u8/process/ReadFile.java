@@ -61,17 +61,8 @@ public class ReadFile {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if(line.contains(".m3u8")) {
-                    if(line.contains("http://")) {
-                        read(line);
-                    } else {
-                        read(htmlPath + "/" + line);
-                    }
-                }
                 if (line.contains(".ts")) {
-                    String path = htmlPath + "/" + line + "&sk=admin";
-                    listLink.add(path);
-                    LOGGER.info(path);
+                    listLink.add(htmlPath + "/" + line + "&sk=admin");
                 }
             }
         } catch (Exception ex) {
