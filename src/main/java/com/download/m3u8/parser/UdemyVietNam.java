@@ -98,7 +98,7 @@ public class UdemyVietNam {
         dataStudy.put("DXScript", "1_16,1_66,1_17,1_18,1_19,1_20,1_13,1_28");
         dataStudy.put("DXCss", "vendor/bootstrap/bootstrap.css,vendor/bootstrap/bootstrap-progressbar-3.css,vendor/font-awesome/css/font-awesome.css,https://fonts.googleapis.com/icon?family=Material+Icons,css/font-awesome.css,css/nprogress.css,css/green.css,css/result.css,css/play.css");
         dataStudy.put("__CALLBACKID", "callbackGetListVideo");
-        dataStudy.put("__CALLBACKPARAM", "c0:59");
+        dataStudy.put("__CALLBACKPARAM", "c0:" + id);
         dataStudy.put("__EVENTVALIDATION", docsLinkGet.select("input[name=\"__EVENTVALIDATION\"]").attr("value"));
 
         Document docsLink = Jsoup.connect("http://study.udemyvietnam.vn/play/study.aspx?courseId=" + id)
