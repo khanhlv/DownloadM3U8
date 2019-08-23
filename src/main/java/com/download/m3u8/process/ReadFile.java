@@ -1,17 +1,16 @@
 package com.download.m3u8.process;
 
-import com.download.m3u8.common.AppGlobal;
-import com.download.m3u8.utils.StringUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.download.m3u8.utils.StringUtil;
 
 public class ReadFile {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReadFile.class);
@@ -45,7 +44,7 @@ public class ReadFile {
     }
 
     public ConcurrentLinkedQueue<String> read(String urlM3U8, String folderRoot) {
-        urlM3U8 = AppGlobal.makeUrl(urlM3U8);
+        urlM3U8 = StringUtil.makeUrl(urlM3U8);
 
         urlM3U8 = fileM3U8(urlM3U8);
 

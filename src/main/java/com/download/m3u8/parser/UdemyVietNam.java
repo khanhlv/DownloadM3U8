@@ -1,31 +1,28 @@
 package com.download.m3u8.parser;
 
-import com.download.m3u8.common.AppGlobal;
-import com.download.m3u8.common.UserAgent;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.download.m3u8.common.AppGlobal;
+import com.download.m3u8.common.UserAgent;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class UdemyVietNam {
     private String userAgent = UserAgent.getUserAgent();
     private Map<String, String> mapCookies;
 
-    public List<UdemyCourse> readCourse() throws Exception {
+    public List<UdemyCourse> readCourse(String user, String pass) throws Exception {
         Map<String, String> data = new HashMap<>();
-        data.put("txtUsername", AppGlobal.USER_NAME_1);
-        data.put("txtPassword", AppGlobal.PASSWORD_1);
+        data.put("txtUsername", user);
+        data.put("txtPassword", pass);
 
         Document docs = Jsoup.connect("http://study.udemyvietnam.vn/Login.aspx")
                 .userAgent(userAgent).timeout(10000).get();
@@ -128,7 +125,7 @@ public class UdemyVietNam {
 
     public static void main(String[] args) throws Exception {
         UdemyVietNam udemyVietNam = new UdemyVietNam();
-        udemyVietNam.readCourse();
+        udemyVietNam.readCourse(AppGlobal.USER_NAME_1, AppGlobal.PASSWORD_1);
         System.out.println(udemyVietNam.readPlayCourse("59").size());
     }
 }

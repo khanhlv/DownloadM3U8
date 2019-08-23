@@ -1,11 +1,12 @@
 package com.download.m3u8.thread;
 
-import com.download.m3u8.common.ShareQueue;
-import com.download.m3u8.process.DownloadFile;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.download.m3u8.common.ShareQueue;
+import com.download.m3u8.process.DownloadFile;
+import com.download.m3u8.utils.FileUtil;
 
 public class ThreadShareQueue implements Runnable {
 
@@ -30,6 +31,8 @@ public class ThreadShareQueue implements Runnable {
                                 new Thread(new DownloadFile(link)).start();
                             }
                         }
+
+                        FileUtil.writeObjectToFile(ShareQueue.shareQueue);
                     }
                 }
 

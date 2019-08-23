@@ -1,18 +1,18 @@
 package com.download.m3u8.process;
 
-import com.download.m3u8.common.AppGlobal;
-import com.download.m3u8.parser.UdemyVietNam;
-import com.download.m3u8.utils.StringUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.download.m3u8.common.AppGlobal;
+import com.download.m3u8.parser.UdemyVietNam;
+import com.download.m3u8.utils.StringUtil;
 
 public class JoinFile {
     private final static Logger LOGGER = LoggerFactory.getLogger(JoinFile.class);
@@ -85,7 +85,7 @@ public class JoinFile {
 
     public void join(String urlM3U8) {
         try {
-            urlM3U8 = AppGlobal.makeUrl(urlM3U8);
+            urlM3U8 = StringUtil.makeUrl(urlM3U8);
 
             String htmlPath = urlM3U8.substring(0, urlM3U8.lastIndexOf("/"));
             String folderPath = htmlPath.substring(htmlPath.lastIndexOf(":") + 1);
@@ -157,7 +157,7 @@ public class JoinFile {
 
         JoinFile joinFile = new JoinFile();
         UdemyVietNam udemyVietNam = new UdemyVietNam();
-        udemyVietNam.readCourse().forEach(d -> {
+        udemyVietNam.readCourse(AppGlobal.USER_NAME_1, AppGlobal.PASSWORD_1).forEach(d -> {
             try {
                 System.out.println(d.getID_COURSE());
                 System.out.println(d.getCOURSE_NAME());

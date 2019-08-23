@@ -1,13 +1,12 @@
 package com.download.m3u8.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Properties;
-
 import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
+
+    public final static String makeUrl(String url) {
+        return StringUtils.replaceAll(url, "\\s+", "+");
+    }
 
     public static String stripAccents(String input) {
         String str = StringUtils.trim(input).toLowerCase();
