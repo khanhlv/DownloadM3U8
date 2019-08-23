@@ -38,7 +38,7 @@ public class ThreadShareQueue implements Runnable {
 
                 LOGGER.info(String.format("THREAD_SHARE[QUEUE=%s][DOWNLOAD=%s]",ShareQueue.shareQueue.size(),ShareQueue.shareQueueDownload.size()));
 
-                Thread.sleep(10000);
+                Thread.sleep(3000);
             }
         } catch (Exception ex) {
             LOGGER.error("ERROR[ThreadShareQueue]", ex);
