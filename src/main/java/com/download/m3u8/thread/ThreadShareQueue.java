@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.common.ShareQueue;
 import com.download.m3u8.process.DownloadFile;
 import com.download.m3u8.utils.FileUtil;
@@ -32,7 +33,7 @@ public class ThreadShareQueue implements Runnable {
                             }
                         }
 
-                        FileUtil.writeObjectToFile(ShareQueue.shareQueue);
+                        FileUtil.writeObjectToFile(ShareQueue.shareQueue, AppGlobal.FILE_OBJECT_SHARE);
                     }
                 }
 
