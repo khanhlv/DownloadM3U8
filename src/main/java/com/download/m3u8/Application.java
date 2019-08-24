@@ -21,8 +21,8 @@ public class Application {
     private final ReadFile readFile = new ReadFile();
 
     private void addQueue(String user, String pass) throws Exception {
-        if (new File("data/ShareQueue.obj").exists()) {
-            ShareQueue.shareQueue = (ConcurrentLinkedQueue<String>) FileUtil.readObjectFromFile("data/ShareQueue.obj");
+        if (new File(AppGlobal.FILE_OBJECT_SHARE).exists()) {
+            ShareQueue.shareQueue = (ConcurrentLinkedQueue<String>) FileUtil.readObjectFromFile(AppGlobal.FILE_OBJECT_SHARE);
             return;
         }
 
@@ -40,9 +40,9 @@ public class Application {
             }
         });
 
-        FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue.obj");
+        FileUtil.writeObjectToFile(ShareQueue.shareQueue, AppGlobal.FILE_OBJECT_SHARE);
 
-        FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue_BK.obj");
+        FileUtil.writeObjectToFile(ShareQueue.shareQueue, AppGlobal.FILE_OBJECT_SHARE + "_bk");
 
         // 210.211.96.151:1935
 //        udemyVietNam.readPlayCourse("59").forEach(v -> {
@@ -64,7 +64,7 @@ public class Application {
                 }
             });
 
-            FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue.obj");
+            FileUtil.writeObjectToFile(ShareQueue.shareQueue, AppGlobal.FILE_OBJECT_SHARE);
 
             Thread.sleep(5000);
 
@@ -114,7 +114,7 @@ public class Application {
         if (args != null && args.length == 2) {
             application.execute(args[0], args[1]);
         } else {
-            application.execute(AppGlobal.USER_NAME_1, AppGlobal.PASSWORD_1);
+            application.execute(AppGlobal.USER_NAME_2, AppGlobal.PASSWORD_2);
         }
     }
 }
