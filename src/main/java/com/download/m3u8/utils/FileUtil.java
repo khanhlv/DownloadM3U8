@@ -32,11 +32,11 @@ public class FileUtil {
         return folder;
     }
 
-    public static void writeObjectToFile(Object serObj) {
+    public static void writeObjectToFile(Object serObj, String file) {
         FileOutputStream fileOut = null;
         ObjectOutputStream objectOut = null;
         try {
-            fileOut = new FileOutputStream("data/ShareQueue.obj");
+            fileOut = new FileOutputStream(file);
             objectOut = new ObjectOutputStream(fileOut);
             objectOut.writeObject(serObj);
             LOGGER.info(String.format("OBJECT_WRITE[SHARE_QUEUE=%s]", ShareQueue.shareQueue.size()));
@@ -60,12 +60,12 @@ public class FileUtil {
         }
     }
 
-    public static Object readObjectFromFile() {
+    public static Object readObjectFromFile(String file) {
         FileInputStream fileInput = null;
         ObjectInputStream objectInput = null;
 
         try {
-            fileInput = new FileInputStream("data/ShareQueue.obj");
+            fileInput = new FileInputStream(file);
             objectInput = new ObjectInputStream(fileInput);
 
             LOGGER.info(String.format("OBJECT_READ[SHARE_QUEUE=%s]", ShareQueue.shareQueue.size()));

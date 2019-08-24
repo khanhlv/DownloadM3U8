@@ -22,7 +22,7 @@ public class Application {
 
     private void addQueue(String user, String pass) throws Exception {
         if (new File("data/ShareQueue.obj").exists()) {
-            ShareQueue.shareQueue = (ConcurrentLinkedQueue<String>) FileUtil.readObjectFromFile();
+            ShareQueue.shareQueue = (ConcurrentLinkedQueue<String>) FileUtil.readObjectFromFile("data/ShareQueue.obj");
             return;
         }
 
@@ -40,7 +40,9 @@ public class Application {
             }
         });
 
-        FileUtil.writeObjectToFile(ShareQueue.shareQueue);
+        FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue.obj");
+
+        FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue_BK.obj");
 
         // 210.211.96.151:1935
 //        udemyVietNam.readPlayCourse("59").forEach(v -> {
@@ -62,7 +64,7 @@ public class Application {
                 }
             });
 
-            FileUtil.writeObjectToFile(ShareQueue.shareQueue);
+            FileUtil.writeObjectToFile(ShareQueue.shareQueue, "data/ShareQueue.obj");
 
             Thread.sleep(5000);
 
