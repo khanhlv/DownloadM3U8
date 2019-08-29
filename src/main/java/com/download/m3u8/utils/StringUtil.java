@@ -32,7 +32,7 @@ public class StringUtil {
     public static String stripAccentsNone(String input, CharSequence character) {
         String str = StringUtils.trim(input);
         str = str.replaceAll("\\s+", character.toString());
-        str = str.replaceAll("(~|!|@|#|$|%|^|&|\\*|\\(|\\)|\\{|\\}|:|'|\\?|\\]|\\[|\\.|\\,|\\;|-)+", character.toString());
+        str = str.replaceAll("(~|!|@|#|$|%|^|&|\\*|\\(|\\)|\\{|\\}|:|'|\\?|\\]|\\[|\\.|\\,|\\;|-|\")+", character.toString());
         str = str.replaceAll(character.toString() + "+", character.toString());
         str = str.replaceAll(character.toString() + "$", "");
         str = str.replaceAll("^" + character.toString(), "");

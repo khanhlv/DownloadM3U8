@@ -1,18 +1,17 @@
 package com.download.m3u8.process;
 
+import com.download.m3u8.common.AppGlobal;
+import com.download.m3u8.parser.UdemyVietNam;
+import com.download.m3u8.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.download.m3u8.common.AppGlobal;
-import com.download.m3u8.parser.UdemyVietNam;
-import com.download.m3u8.utils.StringUtil;
 
 public class JoinFile {
     private final static Logger LOGGER = LoggerFactory.getLogger(JoinFile.class);
@@ -24,8 +23,9 @@ public class JoinFile {
         String folderInput = name.replaceAll(".mp4", "");
         String folderOutput = name.substring(0, name.lastIndexOf("/"));
 
+        String folderOutputRoot = "F:/UdemyVN/";
         File fileInput = new File(AppGlobal.FOLDER_ROOT + input + "/" + folderInput + "/INPUT/");
-        File fileOutput = new File(AppGlobal.FOLDER_ROOT + input + "/" + folderOutput + "/OUTPUT/" + output + "/");
+        File fileOutput = new File(folderOutputRoot + input + "/" + folderOutput + "/OUTPUT/" + output + "/");
 
         if (fileInput.exists()) {
             if(!fileOutput.exists()) {
@@ -56,7 +56,7 @@ public class JoinFile {
                 }
             });
 
-            FileOutputStream fileOutputStream = new FileOutputStream(AppGlobal.FOLDER_ROOT + input + "/" + folderOutput + "/OUTPUT/" + output + "/" + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(folderOutputRoot + input + "/" + folderOutput + "/OUTPUT/" + output + "/" + fileName);
 
             for (int i = 0; i < listFile.length; i++) {
                 String path = AppGlobal.FOLDER_ROOT + input + "/" + folderInput + "/INPUT/" + listFile[i].getName();
@@ -157,7 +157,7 @@ public class JoinFile {
 
         JoinFile joinFile = new JoinFile();
         UdemyVietNam udemyVietNam = new UdemyVietNam();
-        udemyVietNam.readCourse(AppGlobal.USER_NAME_1, AppGlobal.PASSWORD_1).forEach(d -> {
+        udemyVietNam.readCourse(AppGlobal.USER_NAME_4, AppGlobal.PASSWORD_4).forEach(d -> {
             try {
                 System.out.println(d.getID_COURSE());
                 System.out.println(d.getCOURSE_NAME());
@@ -167,12 +167,12 @@ public class JoinFile {
 
                     try {
                         joinFile.join(v.getId(), d.getCOURSE_NAME(), v.getName());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception ex) {
+                        LOGGER.error("ERROR[JoinFile]", ex);
                     }
                 });
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                LOGGER.error("ERROR[JoinFile]", ex);
             }
         });
 

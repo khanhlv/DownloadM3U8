@@ -1,13 +1,5 @@
 package com.download.m3u8;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.download.m3u8.common.AppGlobal;
 import com.download.m3u8.common.ShareQueue;
 import com.download.m3u8.parser.UdemyVietNam;
@@ -15,6 +7,13 @@ import com.download.m3u8.process.ReadFile;
 import com.download.m3u8.thread.ThreadShareQueue;
 import com.download.m3u8.utils.FileUtil;
 import com.download.m3u8.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Application {
     private final static Logger LOGGER = LoggerFactory.getLogger(Application.class);
